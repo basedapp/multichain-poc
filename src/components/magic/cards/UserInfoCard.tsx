@@ -22,6 +22,7 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
 
   const getBalance = useCallback(async () => {
     if (publicAddress && web3) {
+      console.log("GETTING BALANCE", publicAddress);
       const balance = await web3.eth.getBalance(publicAddress);
       if (balance == BigInt(0)) {
         setBalance("0");
@@ -102,7 +103,7 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
       />
 
       <div className="code">
-        {balance.substring(0, 7)} {getNetworkToken()}
+        {balance.substring(0, 7)} {getNetworkToken(process.env.NEXT_PUBLIC_DEFAULT_NETWORK as Network)}
       </div>
       <Divider />
       <CardLabel leftHeader="Token Balances" />

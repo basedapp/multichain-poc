@@ -8,8 +8,10 @@ import google from 'public/social/Google.svg';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
 
+
+
 const Google = ({ token, setToken }: LoginProps) => {
-  const { magic } = useMagic();
+  const { magic, onLogin } = useMagic();
   const [isAuthLoading, setIsAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,8 +23,10 @@ const Google = ({ token, setToken }: LoginProps) => {
       try {
         if (magic) {
           const result = await magic?.oauth.getRedirectResult();
-          const metadata = await magic?.user.getMetadata();
-          if (!metadata?.publicAddress) return;
+          const metadata = await magic?.user.getInfo();
+          if (!metadata?.publicAddress || !result) return;
+          await onLogin();
+          console.log("social login metadata", metadata)
           setToken(result.magic.idToken);
           saveUserInfo(result.magic.idToken, 'SOCIAL', metadata?.publicAddress);
           setLoadingFlag('false');
@@ -64,7 +68,7 @@ const Google = ({ token, setToken }: LoginProps) => {
             disabled={false}
           >
             <Image src={google} alt="Google" height={24} width={24} className="mr-6" />
-            <div className="w-full text-xs font-semibold text-center">Continue with Google</div>
+            <div className="w-full font-semibold text-center text-xs">Continue with Google</div>
           </button>
         </div>
       )}
