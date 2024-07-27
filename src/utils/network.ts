@@ -39,7 +39,7 @@ export const getRPCUrl = (network: Network) => {
 };
 
 export const getNetworkUrl = () => {
-  switch (process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK) {
+  switch (process.env.NEXT_PUBLIC_DEFAULT_NETWORK) {
     case Network.POLYGON:
       return "https://polygon.drpc.org/";
     case Network.POLYGON_AMOY:
@@ -126,7 +126,7 @@ export const getFaucetUrl = (network: Network) => {
 };
 
 export const getNetworkName = (network?: Network) => {
-  switch (network || process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK) {
+  switch (network || process.env.NEXT_PUBLIC_DEFAULT_NETWORK) {
     case Network.POLYGON:
       return "Polygon (Mainnet)";
     case Network.POLYGON_AMOY:
