@@ -69,7 +69,6 @@ const SupportedTokens = {
 
 export function useUserTokens() {
   const [publicAddress] = useState(localStorage.getItem("user"));
-  const { web3 } = useMagic();
 
   const { data, error, ...args } = useSWR(
     publicAddress ? `${publicAddress}/tokens` : null,

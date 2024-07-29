@@ -135,6 +135,20 @@ export const getNetworkName = (network?: Network) => {
       return "Ethereum (Sepolia)";
     case Network.ETHEREUM:
       return "Ethereum (Mainnet)";
+    case Network.BASE:
+      return "Base (Mainnet)";
+    case Network.BASE_SEPOLIA:
+      return "Base (Sepolia)";
+    case Network.ARBITRUM:
+      return "Arbitrum (Mainnet)";
+    case Network.ARBITRUM_SEPOLIA:
+      return "Arbitrum (Sepolia)";
+    case Network.SOLANA:
+      return "Solana (Mainnet)";
+    case Network.SOLANA_DEVNET:
+      return "Solana (Devnet)";
+    default:
+      throw new Error("Network not supported");
   }
 };
 

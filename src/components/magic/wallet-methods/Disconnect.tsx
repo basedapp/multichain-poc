@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { logout } from '@/utils/common';
 import { LoginProps } from '@/utils/types';
-import { useMagic } from '../MagicProvider';
+import { useMagic } from '../../../providers/MagicProvider';
 import Spinner from '@/components/ui/Spinner';
 
 const Disconnect = ({ setToken }: LoginProps) => {
@@ -24,7 +24,7 @@ const Disconnect = ({ setToken }: LoginProps) => {
     <div className="wallet-method-container">
       <button className="wallet-method" onClick={disconnect} disabled={disabled}>
         {disabled ? (
-          <div className="loading-container w-[115px]">
+          <div className="w-[115px] loading-container">
             <Spinner />
           </div>
         ) : (
