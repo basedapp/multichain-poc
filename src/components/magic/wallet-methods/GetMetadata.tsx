@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import showToast from '@/utils/showToast';
-import { useMagic } from '../MagicProvider';
+import { useMagic } from '../../../providers/MagicProvider';
 import Spinner from '@/components/ui/Spinner';
 
 const GetMetadata = () => {
@@ -27,7 +27,7 @@ const GetMetadata = () => {
     <div className="wallet-method-container">
       <button className="wallet-method" onClick={getMetadata} disabled={disabled}>
         {disabled ? (
-          <div className="loading-container w-[220px]">
+          <div className="w-[220px] loading-container">
             <Spinner />
           </div>
         ) : (

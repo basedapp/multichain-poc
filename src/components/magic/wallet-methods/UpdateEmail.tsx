@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import ErrorText from '@/components/ui/ErrorText';
 import Spacer from '@/components/ui/Spacer';
-import { useMagic } from '../MagicProvider';
+import { useMagic } from '../../../providers/MagicProvider';
 import Spinner from '@/components/ui/Spinner';
 import FormInput from '@/components/ui/FormInput';
 import showToast from '@/utils/showToast';
@@ -47,7 +47,7 @@ const UpdateEmail = () => {
       <FormInput value={email} onChange={handleEmailChange} placeholder="New Email" />
       <button className="wallet-method" onClick={updateEmail} disabled={disabled}>
         {disabled ? (
-          <div className="loading-container w-[76px]">
+          <div className="w-[76px] loading-container">
             <Spinner />
           </div>
         ) : (
