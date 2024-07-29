@@ -1,11 +1,12 @@
+import { networksInfoAtom, tokenAtom, UserNetworkInfo } from "@/state/magic-atoms";
 import { getChainId, getRPCUrl, isSolana, Network } from "@/utils/network";
 import { OAuthExtension } from "@magic-ext/oauth";
 import { SolanaExtension } from "@magic-ext/solana";
+import { useAtom } from "jotai";
 import { Magic as MagicBase } from "magic-sdk";
 import {
   ReactNode,
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -16,10 +17,6 @@ import Web3 from "web3";
 
 export type Magic = MagicBase<OAuthExtension[]>;
 
-type UserNetworkInfo = {
-  address: string;
-  network: Network;
-};
 
 type MagicContextType = {
   magic?: Magic;
@@ -27,6 +24,7 @@ type MagicContextType = {
   web3Clients: Partial<Record<Network, Web3>>;
   networkInfos: Partial<Record<Network, UserNetworkInfo>>;
   onLogin: () => void;
+  onLogout: () => void;
 };
 
 const MagicContext = createContext<MagicContextType>({
@@ -35,6 +33,7 @@ const MagicContext = createContext<MagicContextType>({
   web3Clients: {},
   networkInfos: {},
   onLogin: () => { },
+  onLogout: () => { },
 });
 
 export const useMagic = () => useContext(MagicContext);
@@ -47,10 +46,10 @@ type MagicProviderProps = {
 export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProps) => {
   const magicClientsRef = useRef<Partial<Record<Network, Magic>>>({});
   const [web3Clients, setWeb3Clients] = useState<Partial<Record<Network, Web3>>>({});
-  const [networkInfos, setNetworkInfos] = useState<Partial<Record<Network, UserNetworkInfo>>>({});
+
+  const [networkInfos, setNetworkInfos] = useAtom(networksInfoAtom);
+  const [token, setToken] = useAtom(tokenAtom);
   const [magic, setMagic] = useState<Magic | undefined>(undefined);
-
-
 
   const handleLogin = async (network: Network) => {
     const magic = magicClientsRef.current[network];
@@ -60,6 +59,7 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
     }
     const userInfo = await magic.user.getInfo();
     console.log(`network: ${network}, userInfo`, userInfo);
+
     setNetworkInfos((prev) => ({
       ...prev,
       [network]: {
@@ -144,13 +144,20 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
     }
   };
 
+  const onLogout = async () => {
+    console.log("onLogout");
+    setNetworkInfos({} as Record<Network, UserNetworkInfo>);
+    setToken(null);
+  };
+
   const value = useMemo(() => {
     return {
       magicClients: magicClientsRef.current,
       web3Clients,
       networkInfos,
       magic,
-      onLogin
+      onLogin,
+      onLogout
     };
   }, [magicClientsRef.current, web3Clients, magic, networkInfos, onLogin]);
 

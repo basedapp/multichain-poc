@@ -18,6 +18,7 @@
     "autoprefixer": "10.4.14",
     "classnames": "^2.3.2",
     "ethers": "^6.13.2",
+    "jotai": "^2.9.1",
     "magic-sdk": "^21.5.0",
     "next": "13.4.7",
     "postcss": "8.4.24",

@@ -7,11 +7,14 @@ import Image from 'next/image';
 import google from 'public/social/Google.svg';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
+import { tokenAtom } from '@/state/magic-atoms';
+import { useAtom } from 'jotai';
 
 
 
-const Google = ({ token, setToken }: LoginProps) => {
+const Google = () => {
   const { magic, onLogin } = useMagic();
+  const [token, setToken] = useAtom(tokenAtom);
   const [isAuthLoading, setIsAuthLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,7 +66,7 @@ const Google = ({ token, setToken }: LoginProps) => {
           <button
             className="social-login-button"
             onClick={() => {
-              if (token.length == 0) login();
+              if (token?.length == 0) login();
             }}
             disabled={false}
           >

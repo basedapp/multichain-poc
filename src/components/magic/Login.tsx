@@ -1,8 +1,4 @@
 import { LoginProps } from "@/utils/types";
-import Header from "./Header";
-
-import EmailOTP from "./auth/EmailOTP";
-import SMSOTP from "./auth/SMSOTP";
 import Google from "./auth/Google";
 
 const Login = ({ token, setToken }: LoginProps) => {

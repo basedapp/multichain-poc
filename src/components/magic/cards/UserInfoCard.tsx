@@ -1,29 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback } from "react";
 import Divider from "@/components/ui/Divider";
-import { LoginProps } from "@/utils/types";
-import { logout } from "@/utils/common";
 import { useMagic } from "../../../providers/MagicProvider";
 import Card from "@/components/ui/Card";
 import CardLabel from "@/components/ui/CardLabel";
 import Spinner from "@/components/ui/Spinner";
-import { getNetworkName, getNetworkToken, Network } from "@/utils/network";
+import { getNetworkName, Network } from "@/utils/network";
 import { useUserTokens } from "@/hooks/useUserTokens";
 
-const UserInfo = ({ token, setToken }: LoginProps) => {
-  const { magic, networkInfos } = useMagic();
-
-  const [balance, setBalance] = useState("...");
-  const [copied, setCopied] = useState("Copy");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const [publicAddress] = useState(localStorage.getItem("user"));
+const UserInfo = () => {
+  const { networkInfos, onLogout } = useMagic();
   const { data } = useUserTokens();
 
   const disconnect = useCallback(async () => {
-    if (magic) {
-      await logout(setToken, magic);
-    }
-  }, [magic, setToken]);
+    await onLogout();
+  }, [onLogout]);
 
   return (
     <Card>
