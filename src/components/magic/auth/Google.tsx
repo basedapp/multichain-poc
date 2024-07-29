@@ -1,4 +1,3 @@
-import { LoginProps } from '@/utils/types';
 import { useMagic } from '../../../providers/MagicProvider';
 import { useEffect, useState } from 'react';
 import { saveUserInfo } from '@/utils/common';
@@ -7,68 +6,34 @@ import Image from 'next/image';
 import google from 'public/social/Google.svg';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
-import { tokenAtom } from '@/state/magic-atoms';
-import { useAtom } from 'jotai';
+
 
 
 
 const Google = () => {
-  const { magic, onLogin } = useMagic();
-  const [token, setToken] = useAtom(tokenAtom);
-  const [isAuthLoading, setIsAuthLoading] = useState<string | null>(null);
+  const { isLoggedIn, oauthLogin, isAuthLoading, setIsAuthLoading } = useMagic();
 
-  useEffect(() => {
-    setIsAuthLoading(localStorage.getItem('isAuthLoading'));
-  }, []);
 
-  useEffect(() => {
-    const checkLogin = async () => {
-      try {
-        if (magic) {
-          const result = await magic?.oauth.getRedirectResult();
-          const metadata = await magic?.user.getInfo();
-          if (!metadata?.publicAddress || !result) return;
-          await onLogin();
-          console.log("social login metadata", metadata)
-          setToken(result.magic.idToken);
-          saveUserInfo(result.magic.idToken, 'SOCIAL', metadata?.publicAddress);
-          setLoadingFlag('false');
-        }
-      } catch (e) {
-        console.log('social login error: ' + e);
-        setLoadingFlag('false');
-      }
-    };
 
-    checkLogin();
-  }, [magic, setToken]);
 
   const login = async () => {
-    setLoadingFlag('true');
-    await magic?.oauth.loginWithRedirect({
-      provider: 'google',
-      redirectURI: window.location.origin,
-    });
+    oauthLogin("google");
   };
 
-  const setLoadingFlag = (loading: string) => {
-    localStorage.setItem('isAuthLoading', loading);
-    setIsAuthLoading(loading);
-  };
 
   return (
     <Card>
       <CardHeader id="google">Google Login</CardHeader>
-      {isAuthLoading && isAuthLoading !== 'false' ? (
+      {isAuthLoading ? (
         <Spinner />
       ) : (
         <div className="login-method-grid-item-container">
           <button
             className="social-login-button"
             onClick={() => {
-              if (token?.length == 0) login();
+              if (!isLoggedIn) login();
             }}
-            disabled={false}
+            disabled={isLoggedIn}
           >
             <Image src={google} alt="Google" height={24} width={24} className="mr-6" />
             <div className="w-full font-semibold text-center text-xs">Continue with Google</div>

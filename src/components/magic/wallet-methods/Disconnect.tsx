@@ -1,24 +1,23 @@
 import React, { useCallback, useState } from 'react';
-import { logout } from '@/utils/common';
-import { LoginProps } from '@/utils/types';
+
 import { useMagic } from '../../../providers/MagicProvider';
 import Spinner from '@/components/ui/Spinner';
 
-const Disconnect = ({ setToken }: LoginProps) => {
-  const { magic } = useMagic();
+const Disconnect = () => {
+  const { magic, onLogout } = useMagic();
   const [disabled, setDisabled] = useState(false);
 
   const disconnect = useCallback(async () => {
     if (!magic) return;
     try {
       setDisabled(true);
-      await logout(setToken, magic);
+      await onLogout();
       setDisabled(false);
     } catch (error) {
       setDisabled(false);
       console.error(error);
     }
-  }, [magic, setToken]);
+  }, [onLogout]);
 
   return (
     <div className="wallet-method-container">

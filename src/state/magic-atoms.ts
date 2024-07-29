@@ -2,7 +2,20 @@ import { atom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { Network } from "@/utils/network";
 
-export const tokenAtom = atomWithStorage<string>("magic-token", "");
+export type LoginMethod = "SOCIAL" | "EMAIL" | "SMS";
+export type MagicInfo =
+  | {
+      isLoggedIn: boolean;
+      publicAddress?: string;
+      loginMethod?: LoginMethod;
+      token?: string;
+    }
+  | undefined;
+
+export const magicInfoAtom = atomWithStorage<MagicInfo>(
+  "magic-info",
+  undefined
+);
 
 export type UserNetworkInfo = {
   address: string;

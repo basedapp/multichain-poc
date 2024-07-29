@@ -1,9 +1,10 @@
-import { networksInfoAtom, tokenAtom, UserNetworkInfo } from "@/state/magic-atoms";
+import { useSearchParams } from "next/navigation";
+import { LoginMethod, MagicInfo, magicInfoAtom, networksInfoAtom, UserNetworkInfo } from "@/state/magic-atoms";
 import { getChainId, getRPCUrl, isSolana, Network } from "@/utils/network";
-import { OAuthExtension } from "@magic-ext/oauth";
+import { OAuthExtension, OAuthProvider } from "@magic-ext/oauth";
 import { SolanaExtension } from "@magic-ext/solana";
 import { useAtom } from "jotai";
-import { Magic as MagicBase } from "magic-sdk";
+import { Magic as MagicBase, MagicUserMetadata, UserInfo } from "magic-sdk";
 import {
   ReactNode,
   createContext,
@@ -14,17 +15,20 @@ import {
   useState,
 } from "react";
 import Web3 from "web3";
+import { useHostname } from "@/hooks/useHostname";
 
 export type Magic = MagicBase<OAuthExtension[]>;
-
 
 type MagicContextType = {
   magic?: Magic;
   magicClients: Partial<Record<Network, Magic>>;
   web3Clients: Partial<Record<Network, Web3>>;
   networkInfos: Partial<Record<Network, UserNetworkInfo>>;
-  onLogin: () => void;
+  magicInfo: MagicInfo;
+  oauthLogin: (provider: OAuthProvider) => void;
   onLogout: () => void;
+  isAuthLoading: boolean;
+  isLoggedIn: boolean;
 };
 
 const MagicContext = createContext<MagicContextType>({
@@ -32,8 +36,11 @@ const MagicContext = createContext<MagicContextType>({
   magicClients: {},
   web3Clients: {},
   networkInfos: {},
-  onLogin: () => { },
+  magicInfo: undefined,
+  oauthLogin: (provider: OAuthProvider) => { },
   onLogout: () => { },
+  isAuthLoading: false,
+  isLoggedIn: false,
 });
 
 export const useMagic = () => useContext(MagicContext);
@@ -44,14 +51,22 @@ type MagicProviderProps = {
 };
 
 export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProps) => {
+
+  const searchParams = useSearchParams();
+  const hasOauthLoginParams = searchParams?.has("magic_oauth_request_id");
+
+  const hostname = useHostname();
+
   const magicClientsRef = useRef<Partial<Record<Network, Magic>>>({});
   const [web3Clients, setWeb3Clients] = useState<Partial<Record<Network, Web3>>>({});
 
-  const [networkInfos, setNetworkInfos] = useAtom(networksInfoAtom);
-  const [token, setToken] = useAtom(tokenAtom);
-  const [magic, setMagic] = useState<Magic | undefined>(undefined);
 
-  const handleLogin = async (network: Network) => {
+  const [networkInfos, setNetworkInfos] = useAtom(networksInfoAtom);
+  const [magicInfo, setMagicInfo] = useAtom(magicInfoAtom);
+  const [magic, setMagic] = useState<Magic | undefined>(undefined);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+
+  const updateUserNetworkInfo = async (network: Network) => {
     const magic = magicClientsRef.current[network];
     if (!magic) {
       console.log("No magic client for network", network);
@@ -70,12 +85,17 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
   };
 
 
+  // Initialise multiple magic clients
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_MAGIC_API_KEY) {
       throw new Error("NEXT_PUBLIC_MAGIC_API_KEY is not set");
     }
 
-    console.log("Init magic clients")
+    if (Object.keys(magicClientsRef.current).length == supportedNetworks.length) {
+      console.log("Skipping magic clients initialisation");
+      return;
+    }
+
     const newMagicClients: Partial<Record<Network, Magic>> = {};
     const newWeb3Clients: Partial<Record<Network, Web3>> = {};
 
@@ -116,15 +136,12 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
         newWeb3Clients[network] = new Web3((magic as any).rpcProvider);
       }
 
-
-
       newMagicClients[network] = magic;
 
       magic.user.isLoggedIn().then((isLoggedIn) => {
         console.log(`network: ${network}, isLoggedIn`, isLoggedIn);
-        if (isLoggedIn) {
-          handleLogin(network);
-        }
+        syncLoggedInState(isLoggedIn);
+        updateUserNetworkInfo(network);
       });
 
     });
@@ -137,17 +154,71 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
   }, [supportedNetworks]);
 
 
-  const onLogin = async () => {
+  useEffect(() => {
+    const redirectOauth = async () => {
+      try {
+        if (!magic) return;
+        console.log("Getting oauth redirect result");
+        const result = await magic.oauth.getRedirectResult();
+        if (!result) return;
+        console.log("social login metadata", result);
+        await onLogin(result.magic.idToken, result.magic.userMetadata, "SOCIAL");
+      } catch (e) {
+        console.log('social login error: ' + e);
+      } finally {
+        setIsAuthLoading(false);
+      }
+    };
+
+    if (hasOauthLoginParams) {
+      redirectOauth();
+    }
+  }, [magic]);
+
+  const syncLoggedInState = async (isLoggedIn: boolean) => {
+    if (!!magicInfo?.isLoggedIn === isLoggedIn) return;
+
+    if (isLoggedIn) {
+      onLogin();
+    } else {
+      onLogout();
+    }
+  }
+
+  const oauthLogin = async (provider: OAuthProvider) => {
+    if (!magic) return;
+    try {
+      await magic.oauth.loginWithRedirect({
+        provider: provider /* 'google', 'facebook', 'apple', or 'github' */,
+        redirectURI: hostname,
+        scope: ["openid"] /* optional */,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onLogin = async (token?: string, metadata?: MagicUserMetadata, loginMethod?: LoginMethod) => {
     console.log("onLogin");
+    setMagicInfo({
+      token,
+      publicAddress: metadata?.publicAddress ?? "",
+      loginMethod,
+      isLoggedIn: true,
+    });
     for (const network of supportedNetworks) {
-      handleLogin(network);
+      updateUserNetworkInfo(network);
     }
   };
 
   const onLogout = async () => {
     console.log("onLogout");
     setNetworkInfos({} as Record<Network, UserNetworkInfo>);
-    setToken(null);
+    setMagicInfo(undefined);
+    if (await magic?.user.isLoggedIn()) {
+      await magic?.user.logout();
+    }
+    setIsAuthLoading(false);
   };
 
   const value = useMemo(() => {
@@ -156,10 +227,13 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
       web3Clients,
       networkInfos,
       magic,
-      onLogin,
-      onLogout
+      onLogout,
+      magicInfo,
+      isAuthLoading,
+      oauthLogin,
+      isLoggedIn: magicInfo?.isLoggedIn ?? false,
     };
-  }, [magicClientsRef.current, web3Clients, magic, networkInfos, onLogin]);
+  }, [magicClientsRef.current, web3Clients, magic, networkInfos, onLogin, magicInfo, onLogout, isAuthLoading, setIsAuthLoading]);
 
   return (
     <MagicContext.Provider value={value}>{children}</MagicContext.Provider>
