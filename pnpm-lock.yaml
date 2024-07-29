@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@magic-ext/oauth':
-        specifier: ^15.0.0
-        version: 15.6.0
+        specifier: ^22.2.0
+        version: 22.2.0
       '@magic-ext/solana':
         specifier: ^25.3.0
         version: 25.3.0(@solana/web3.js@1.95.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))
@@ -35,9 +35,12 @@ importers:
       ethers:
         specifier: ^6.13.2
         version: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      jotai:
+        specifier: ^2.9.1
+        version: 2.9.1(@types/react@18.2.14)(react@18.2.0)
       magic-sdk:
-        specifier: ^21.5.0
-        version: 21.5.0
+        specifier: ^28.2.0
+        version: 28.2.0
       next:
         specifier: 13.4.7
         version: 13.4.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -188,27 +191,27 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@magic-ext/oauth@15.6.0':
-    resolution: {integrity: sha512-OBLxdPUvL+kW/DIxH8V5Fp4rjkV7LdFfVkRHdy6dPBhdbJjpD9/XOReNZnWa45OHx7+OOl1OocPtXn9hEAFoyQ==}
+  '@magic-ext/oauth@22.2.0':
+    resolution: {integrity: sha512-p0R2dHf83AA2SQ5IhIxmV7rtDjU0AofeV+s0uG8Pn+5oU7BhScfm0yPWMKhepoJYnsaEMHqjd0HPF23sXWkVIQ==}
 
   '@magic-ext/solana@25.3.0':
     resolution: {integrity: sha512-l9GUB4nAHYYxClo+DiCZDYtNpEQUVq4wmigzpVxQ19+q/5vIv0iVj/6WcPj5DhgdCbDNFMKioKfI7M4irFrbbg==}
     peerDependencies:
       '@solana/web3.js': ^1.87.2
 
-  '@magic-sdk/commons@17.5.0':
-    resolution: {integrity: sha512-2KdLT6KTNnToOuTb92a/Ur/zGfV8/M89W+wqrcumcSmdOOyD65C80q2Gd70OF2+HZEOPEfBp8vBTfOGyRSb8fg==}
+  '@magic-sdk/commons@24.2.0':
+    resolution: {integrity: sha512-g3sruzr0RzNZurWYEPWV9JI0Odgj4fwPeC/Q54N/Ph/pLMoo8p6N04wGA6bZs+9kZ9DmR60tS71v7x0c2+FfbQ==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
 
-  '@magic-sdk/provider@21.5.0':
-    resolution: {integrity: sha512-q2UAww4Hv8qDg+GYUqmUhdLPL5lfmYXpD6HN1IMI1HBU/SG2hLMVs/28u+RrCC1GddrqTTDal9GXONd3OHurHA==}
+  '@magic-sdk/provider@28.2.0':
+    resolution: {integrity: sha512-ie6yoMdVhrYLFJ6SOhJdqPJDVZGUU+6sjmMrykaNRhQJrYsDpFxO+3fuIt0Z/WA86YewkyftdmcMgGpz93roIQ==}
     peerDependencies:
       localforage: ^1.7.4
 
-  '@magic-sdk/types@17.3.0':
-    resolution: {integrity: sha512-0mTFr1qDJ94pOJkFu1oZ/s2KnV7lHgILvWuFh7fs7ugyn7z9M7euP9g+Bv+kEdZ6ja4QlNi+UR0OryaXowv75w==}
+  '@magic-sdk/types@24.0.5':
+    resolution: {integrity: sha512-RTG3AmAxX+ZGqv3gdJ9+cPZoAa2j0MG1v0OCPcf9kaDbO51xD+FjBbh4Evbcx1ch6092Pq2t50c4VgiSG7KGSg==}
 
   '@next/env@13.4.7':
     resolution: {integrity: sha512-ZlbiFulnwiFsW9UV1ku1OvX/oyIPLtMk9p/nnvDSwI0s7vSoZdRtxXNsaO+ZXrLv/pMbXVGq4lL8TbY9iuGmVw==}
@@ -1394,6 +1397,18 @@ packages:
     resolution: {integrity: sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==}
     hasBin: true
 
+  jotai@2.9.1:
+    resolution: {integrity: sha512-t4Q7FIqQB3N/1art4OcqdlEtPmQ2h4DNIzTFhvt06WE0kCpQ1QoG+1A1IGTaQBi2KdDRsnywj+ojmHHKgw6PDA==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+
   js-sha3@0.8.0:
     resolution: {integrity: sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==}
 
@@ -1477,8 +1492,8 @@ packages:
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
-  magic-sdk@21.5.0:
-    resolution: {integrity: sha512-LNSTJGOO1wtJSwoEnO8ehH3RePdYc3lc0pD+SGZWyY78Ly6CgNE15lILBGJvpdaZjZd6wVqDYOf6Hh+PayuNKg==}
+  magic-sdk@28.2.0:
+    resolution: {integrity: sha512-XNdsoynu6ikGG8pkq/EF/kJA9I5N0PihyDuMC7+so4HvG6zmezRzQaPtKF2rHmHzGLvIHJYGgbG5SytyWPwUiw==}
 
   md5.js@1.3.5:
     resolution: {integrity: sha512-xitP+WxNPcTTOgnTJcrhM0xvdPepipPSf3I8EIpGKeFLjt3PlJLIDG3u8EX53ZIubkb+5U2+3rELYpEhHhzdkg==}
@@ -2546,7 +2561,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@magic-ext/oauth@15.6.0':
+  '@magic-ext/oauth@22.2.0':
     dependencies:
       crypto-js: 3.3.0
 
@@ -2554,21 +2569,21 @@ snapshots:
     dependencies:
       '@solana/web3.js': 1.95.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
-  '@magic-sdk/commons@17.5.0(@magic-sdk/provider@21.5.0(localforage@1.10.0))(@magic-sdk/types@17.3.0)':
+  '@magic-sdk/commons@24.2.0(@magic-sdk/provider@28.2.0(localforage@1.10.0))(@magic-sdk/types@24.0.5)':
     dependencies:
-      '@magic-sdk/provider': 21.5.0(localforage@1.10.0)
-      '@magic-sdk/types': 17.3.0
+      '@magic-sdk/provider': 28.2.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.0.5
 
-  '@magic-sdk/provider@21.5.0(localforage@1.10.0)':
+  '@magic-sdk/provider@28.2.0(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 17.3.0
+      '@magic-sdk/types': 24.0.5
       eventemitter3: 4.0.7
       localforage: 1.10.0
       web3-core: 1.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@magic-sdk/types@17.3.0': {}
+  '@magic-sdk/types@24.0.5': {}
 
   '@next/env@13.4.7': {}
 
@@ -4045,6 +4060,11 @@ snapshots:
 
   jiti@1.21.6: {}
 
+  jotai@2.9.1(@types/react@18.2.14)(react@18.2.0):
+    optionalDependencies:
+      '@types/react': 18.2.14
+      react: 18.2.0
+
   js-sha3@0.8.0: {}
 
   js-tokens@4.0.0: {}
@@ -4121,11 +4141,11 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  magic-sdk@21.5.0:
+  magic-sdk@28.2.0:
     dependencies:
-      '@magic-sdk/commons': 17.5.0(@magic-sdk/provider@21.5.0(localforage@1.10.0))(@magic-sdk/types@17.3.0)
-      '@magic-sdk/provider': 21.5.0(localforage@1.10.0)
-      '@magic-sdk/types': 17.3.0
+      '@magic-sdk/commons': 24.2.0(@magic-sdk/provider@28.2.0(localforage@1.10.0))(@magic-sdk/types@24.0.5)
+      '@magic-sdk/provider': 28.2.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.0.5
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
