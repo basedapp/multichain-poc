@@ -4,7 +4,7 @@ import { getChainId, getRPCUrl, isSolana, Network } from "@/utils/network";
 import { OAuthExtension, OAuthProvider } from "@magic-ext/oauth";
 import { SolanaExtension } from "@magic-ext/solana";
 import { useAtom } from "jotai";
-import { Magic as MagicBase, MagicUserMetadata, UserInfo } from "magic-sdk";
+import { Magic as MagicBase, MagicUserMetadata, RPCError, RPCErrorCode, UserInfo } from "magic-sdk";
 import {
   ReactNode,
   createContext,
@@ -37,7 +37,7 @@ const MagicContext = createContext<MagicContextType>({
   web3Clients: {},
   networkInfos: {},
   magicInfo: undefined,
-  oauthLogin: (provider: OAuthProvider) => { },
+  oauthLogin: (_provider: OAuthProvider) => { },
   onLogout: () => { },
   isAuthLoading: false,
   isLoggedIn: false,
@@ -142,8 +142,9 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
         console.log(`network: ${network}, isLoggedIn`, isLoggedIn);
         syncLoggedInState(isLoggedIn);
         updateUserNetworkInfo(network);
+      }).catch((e) => {
+        console.log("Error checking if user is logged in", e);
       });
-
     });
 
     console.log("nMagicClients", Object.keys(newMagicClients).length);
@@ -193,8 +194,24 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
         redirectURI: hostname,
         scope: ["openid"] /* optional */,
       });
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      if (err instanceof RPCError) {
+        switch (err.code) {
+          case RPCErrorCode.MagicLinkFailedVerification:
+            console.log("Magic link failed verification");
+            break;
+          case RPCErrorCode.MagicLinkExpired:
+            console.log("Magic link expired");
+            break;
+          case RPCErrorCode.MagicLinkRateLimited:
+            console.log("Magic link rate limited");
+            break;
+          case RPCErrorCode.UserAlreadyLoggedIn:
+            console.log("User already logged in");
+            break;
+        }
+      }
+      console.log(err);
     }
   };
 
