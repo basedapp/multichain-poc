@@ -1,6 +1,5 @@
 import { useMagic } from '../../../providers/MagicProvider';
-import { useEffect, useState } from 'react';
-import { saveUserInfo } from '@/utils/common';
+
 import Spinner from '../../ui/Spinner';
 import Image from 'next/image';
 import google from 'public/social/Google.svg';
@@ -11,15 +10,11 @@ import CardHeader from '../../ui/CardHeader';
 
 
 const Google = () => {
-  const { isLoggedIn, oauthLogin, isAuthLoading, setIsAuthLoading } = useMagic();
-
-
-
+  const { isLoggedIn, oauthLogin, isAuthLoading } = useMagic();
 
   const login = async () => {
     oauthLogin("google");
   };
-
 
   return (
     <Card>

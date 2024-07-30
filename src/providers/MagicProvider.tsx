@@ -64,7 +64,9 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
   const [networkInfos, setNetworkInfos] = useAtom(networksInfoAtom);
   const [magicInfo, setMagicInfo] = useAtom(magicInfoAtom);
   const [magic, setMagic] = useState<Magic | undefined>(undefined);
+
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+
 
   const updateUserNetworkInfo = async (network: Network) => {
     const magic = magicClientsRef.current[network];
@@ -72,6 +74,12 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
       console.log("No magic client for network", network);
       return;
     }
+    console.log("Getting info")
+    if (networkInfos[network]) {
+      console.log("Skipping get info for network", network);
+      return;
+    }
+
     const userInfo = await magic.user.getInfo();
     console.log(`network: ${network}, userInfo`, userInfo);
 
@@ -137,14 +145,6 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
       }
 
       newMagicClients[network] = magic;
-
-      magic.user.isLoggedIn().then((isLoggedIn) => {
-        console.log(`network: ${network}, isLoggedIn`, isLoggedIn);
-        syncLoggedInState(isLoggedIn);
-        updateUserNetworkInfo(network);
-      }).catch((e) => {
-        console.log("Error checking if user is logged in", e);
-      });
     });
 
     console.log("nMagicClients", Object.keys(newMagicClients).length);
@@ -160,6 +160,7 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
       try {
         if (!magic) return;
         console.log("Getting oauth redirect result");
+        setIsAuthLoading(true);
         const result = await magic.oauth.getRedirectResult();
         if (!result) return;
         console.log("social login metadata", result);
@@ -171,15 +172,26 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
       }
     };
 
+    const checkLoggedIn = async () => {
+      if (!magic) return;
+      console.log("Checking login status")
+      const isLoggedIn = await magic.user.isLoggedIn();
+      console.log(`Checked isLoggedIn`, isLoggedIn);
+      syncLoggedInState(isLoggedIn);
+    }
+
     if (hasOauthLoginParams) {
       redirectOauth();
+    } else {
+      checkLoggedIn();
     }
-  }, [magic]);
+  }, [magic, hasOauthLoginParams]);
 
-  const syncLoggedInState = async (isLoggedIn: boolean) => {
-    if (!!magicInfo?.isLoggedIn === isLoggedIn) return;
+  const syncLoggedInState = async (newLoggedInState: boolean) => {
+    console.log("isLoggedIn", magicInfo?.isLoggedIn, "newLoggedInState", newLoggedInState);
+    if (!!magicInfo?.isLoggedIn === newLoggedInState) return;
 
-    if (isLoggedIn) {
+    if (newLoggedInState) {
       onLogin();
     } else {
       onLogout();
@@ -216,13 +228,9 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
   };
 
   const onLogin = async (token?: string, metadata?: MagicUserMetadata, loginMethod?: LoginMethod) => {
-    console.log("onLogin");
-    setMagicInfo({
-      token,
-      publicAddress: metadata?.publicAddress ?? "",
-      loginMethod,
-      isLoggedIn: true,
-    });
+    // console.log("onLogin", isLoggedIn);
+    // setIsLoggedIn(true);
+    setMagicInfo(prev => ({ ...prev, isLoggedIn: true }));
     for (const network of supportedNetworks) {
       updateUserNetworkInfo(network);
     }
@@ -232,6 +240,7 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
     console.log("onLogout");
     setNetworkInfos({} as Record<Network, UserNetworkInfo>);
     setMagicInfo(undefined);
+    // setIsLoggedIn(false);
     if (await magic?.user.isLoggedIn()) {
       await magic?.user.logout();
     }
@@ -248,9 +257,9 @@ export const MagicProvider = ({ children, supportedNetworks }: MagicProviderProp
       magicInfo,
       isAuthLoading,
       oauthLogin,
-      isLoggedIn: magicInfo?.isLoggedIn ?? false,
+      isLoggedIn: !!magicInfo?.isLoggedIn
     };
-  }, [magicClientsRef.current, web3Clients, magic, networkInfos, onLogin, magicInfo, onLogout, isAuthLoading, setIsAuthLoading]);
+  }, [magicClientsRef.current, web3Clients, magic, networkInfos, onLogin, onLogout, isAuthLoading]);
 
   return (
     <MagicContext.Provider value={value}>{children}</MagicContext.Provider>
